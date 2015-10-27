@@ -1,3 +1,9 @@
+# Don't attempt to strip binaries
+%global __os_install_post %{nil}
+
+# Don't create debug files
+%define debug_package %{nil}
+
 # The following macros can either be defined here or passed into rpmbuild as macros
 # This is required:
 # %%define _version 7.7
@@ -275,7 +281,7 @@ fi
 %attr(0644,squeezeboxserver,squeezeboxserver) %ghost %{_var}/lib/squeezeboxserver/prefs/plugin/rescan.prefs
 %attr(0644,squeezeboxserver,squeezeboxserver) %ghost %{_var}/lib/squeezeboxserver/prefs/plugin/rssnews.prefs
 %attr(0644,squeezeboxserver,squeezeboxserver) %ghost %{_var}/lib/squeezeboxserver/prefs/plugin/state.prefs
-%attr(0644,squeezeboxserver,squeezeboxserver) %{_sysconfdir}/squeezeboxserver/server.conf
+%{_sysconfdir}/squeezeboxserver/server.conf
 %attr(0644,squeezeboxserver,squeezeboxserver) %config(noreplace) %{_sysconfdir}/squeezeboxserver/convert.conf
 %attr(0644,squeezeboxserver,squeezeboxserver) %config(noreplace) %{_sysconfdir}/squeezeboxserver/modules.conf
 %attr(0644,squeezeboxserver,squeezeboxserver) %config(noreplace) %{_sysconfdir}/squeezeboxserver/types.conf
@@ -286,6 +292,11 @@ fi
 
 
 %changelog
+* Tue Oct 27 2015 Robert Moser II <rlmoser@gmail.com>
+- Fix entry in changelog
+- Disable stripping and debug building
+- Disable attr setting on symlink for /etc/squeezeboxserver/server.conf
+
 * Wed Oct 31 2007 Robin Bowes <robin@robinbowes.com>
 - Fix SELinux contexts
 
@@ -304,7 +315,7 @@ fi
 * Tue Oct 16 2007 andy
 - Removed deps on perl-XML-Parser and perl-Digest-SHA1
 
-* Tue Apr 11 2005 dsully
+* Mon Apr 11 2005 dsully
 - Make the RPM more SuSE friendly.
 - Fix an error with printing the port number on install/upgrade. (bug 974)
 
