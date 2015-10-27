@@ -341,6 +341,22 @@ sub getRevisionForRepo {
 }
 
 ##############################################################################################
+## We need to know the revision # of the CPAN arch directory, so we can keep the package    ##
+## name consistent among nightly builds.                                                    ##
+## This only works for non-shallow git clones.                                              ##
+##############################################################################################
+sub getRevisionForCPAN {
+	my $revision;
+        if (-d "$sourceDir/server/.git") {
+		$revision = `git --git-dir=$sourceDir/server/.git log -n 1 --pretty=format:%ct -- CPAN/arch`;
+		$revision =~ s/\s*$//s;
+	} else {
+		$revision = 'UNKNOWN';
+	}
+	return $revision;
+}
+
+##############################################################################################
 ## display the help
 ##############################################################################################
 sub showUsage {
