@@ -4,6 +4,14 @@
 # Don't create debug files
 %define debug_package %{nil}
 
+# Use MD5 for digests (needed for CentOS 5)
+%define _source_filedigest_algorithm 1
+%define _binary_filedigest_algorithm 1
+
+# Use gzip for compression (xz not supported on CentOS 5)
+%define _source_payload w9.gzdio
+%define _binary_payload w9.gzdio
+
 # The following macros can either be defined here or passed into rpmbuild as macros
 # This is required:
 # %%define _version 7.7
@@ -26,12 +34,15 @@
 
 %if %{build_trunk}
 %define rpm_release 0.%{increment}.%{_revision}
+%define cpan_release 0.%{increment}.%{_revisionCPAN}
 %endif
 %if %{build_branch}
 %define rpm_release 0.%{increment}.%{_revision}
+%define cpan_release 0.%{increment}.%{_revisionCPAN}
 %endif
 %if %{build_release}
 %define rpm_release 1
+%define cpan_release 1
 %endif
 
 
@@ -52,7 +63,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-buildroot
 Vendor:		Logitech
 
 
-Requires:	perl >= 5.8.8
+Requires:	perl >= 5.8.8, %{name}-CPAN >= %{version}-%{cpan_release}
 Obsoletes:	squeezeboxserver, squeezecenter, slimserver, SliMP3
 AutoReqProv:	no
 
@@ -63,6 +74,19 @@ Logitech Media Server powers the Squeezebox, Transporter and SLIMP3 network musi
 players and is the best software to stream your music to any software MP3 
 player. It supports MP3, AAC, WMA, FLAC, Ogg Vorbis, WAV and more!
 As of version 7.7 it also supports UPnP clients, serving pictures and movies too!
+
+%package CPAN
+Summary:	Logitech Media Server (private CPAN binary components)
+Group:		System Environment/Daemons          
+Release:	%{cpan_release}
+AutoReqProv:	no
+
+%description CPAN
+Logitech Media Server powers the Squeezebox, Transporter and SLIMP3 network music 
+players and is the best software to stream your music to any software MP3 
+player. It supports MP3, AAC, WMA, FLAC, Ogg Vorbis, WAV and more!
+As of version 7.7 it also supports UPnP clients, serving pictures and movies too!
+This CPAN sub-package provides the 'private' perl CPAN binary components.
 
 %prep
 %setup -q -n %{src_basename}
@@ -238,11 +262,18 @@ fi
 %postun
 
 
+%files CPAN
+%defattr(-,root,root,-)
+%{_datadir}/squeezeboxserver/CPAN/arch
+
 %files
 %defattr(-,root,root,-)
 
 # Documentation files
 %doc Changelog*.html Installation.txt License.* README.lib README.HTML
+
+# Exclude CPAN architecture specific binaries
+%exclude %{_datadir}/squeezeboxserver/CPAN/arch/*
 
 # Main files
 %{_usr}/lib/perl5/vendor_perl/Slim
@@ -292,6 +323,10 @@ fi
 
 
 %changelog
+* Wed Oct 28 2015 Robert Moser II <rlmoser@gmail.com>
+- Split CPAN architecture specific binaries into subpackage
+- Force use of MD5 and gzip in rpm for compatibility with older rpm versions
+
 * Tue Oct 27 2015 Robert Moser II <rlmoser@gmail.com>
 - Fix entry in changelog
 - Disable stripping and debug building

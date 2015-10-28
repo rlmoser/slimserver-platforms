@@ -17,6 +17,7 @@ my $squeezeCenterStartupScript = "server/slimserver.pl";
 my $sourceDirsToExclude = ".svn .git tests slimp3 squeezebox /softsqueeze tools ext/source ext-all-debug.js build"; 
 my $revisionTextFile = "server/revision.txt";
 my $revision;
+my $revisionCPAN;
 my $myVersion = "0.0.3";
 my $defaultDestName = "logitechmediaserver";
 my $defaultReleaseType = "nightly";
@@ -247,6 +248,9 @@ sub setupBuildTree {
 		print REV "$revision\n$date";
 		close(REV);
 	} 
+
+	# Set the revision number for CPAN arch binaries
+	$revisionCPAN = getRevisionForCPAN();
 }
 
 ##############################################################################################
@@ -521,7 +525,7 @@ sub buildRPM {
 
         # Do it
         my $date = strftime('%Y-%m-%d', localtime());
-        print `rpmbuild -bb --with $releaseType --define="src_basename $defaultDestName" --define="_version $version" --define="_src_date $date" --define="_revision $revision" --define='_topdir $buildDir/rpm' $buildDir/rpm/SPECS/squeezeboxserver.spec`;
+        print `rpmbuild -bb --with $releaseType --define="src_basename $defaultDestName" --define="_version $version" --define="_src_date $date" --define="_revision $revision" --define="_revisionCPAN $revisionCPAN" --define='_topdir $buildDir/rpm' $buildDir/rpm/SPECS/squeezeboxserver.spec`;
 
 	## Just move the file out of the building directory, and put it into the destDir
 	print "INFO: Moving $buildDir/rpm/RPMS/noarch/*.rpm to $destDir\n";
