@@ -1,2 +1,2 @@
-../server/Change*
-../server/Installation.txt
+debian/tmp/Change*
+debian/tmp/Installation.txt
